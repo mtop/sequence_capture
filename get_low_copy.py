@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Identifies BLAST matches with an e-value < threshold value.
+# Identifies BLAST matches with an e-value > threshold value.
 #
 # Input: Expects an inputfile (blast table [-outfmt 7 or similar] 
 # where only the two best maches have been saved.
