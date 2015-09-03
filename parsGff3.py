@@ -74,14 +74,16 @@ def parse_gff3():
 			# Instantiate a new gene object
 			new_gene = Gene()
 	#		new_gene.set_parent(line.split()[8].split(";")[4].split("Parent=")[1])
-			new_gene.set_name(line.split()[8].split(";")[1].split("Name=")[1])
-			new_gene.set_pacid(line.split()[8].split(";")[2].split("pacid=")[1])
+			new_gene.set_parent(line.split()[8].split(";")[1].split("Parent=")[1])
+			new_gene.set_name(line.split()[8].split(";")[2].split("Name=")[1])
+			new_gene.set_pacid(line.split()[8].split(";")[0].split("ID=")[1])
 			gene_dict[new_gene.get_pacid()] = new_gene
 			pacid_to_name[new_gene.get_pacid()] = new_gene.get_name()
 		
 		# Identify CDS'es and store info. in the correct Gene object.
 		if line.split()[2] == "CDS":
-			pacid = line.split()[8].split(";")[2].split("pacid=")[1]
+	#		pacid = line.split()[8].split(";")[2].split("pacid=")[1]
+			pacid = line.split()[8].lstrip("Parent=")
 			start = line.split()[3]
 			stop = line.split()[4]
 			gene_dict[pacid].add_CDS(start, stop)
