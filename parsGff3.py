@@ -6,7 +6,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--gff3", help="Name of gff3 file to parse the CDS information from")
 parser.add_argument("--cds", help="Set the minimum number of CDS regions required for a gene to be accepted", default=1)
-parser.add_argument("--min_cds_length", help="Set the minimum length of the CDS regions required for a gene to be accepted", default=1)
+parser.add_argument("--min_cds_length", help="Set the minimum length for any single CDS region", default=1)
 parser.add_argument("-v", "--verbose", help="Print additional information about identified genes to STDOUT", action="store_true")
 args = parser.parse_args()
 
