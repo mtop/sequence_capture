@@ -6,10 +6,12 @@ The first part of your analysis should be to familiarise yourself with the input
 
 ![Data](images/1.png)
 
+In this figure we see the phylogenetic relationship between the two species from where we have transcriptome data (Tr.1 and Tr.2) and one species with an annotated reference genome (or Whole Genome Sequence dataset [WGS]). The number of species from which WGS data is available is rather limited, but a species from the same family or order as your ingroup taxa will most likely be sufficient. 
+
 ## Basic work flow
 A more comprehensive description of the steps involved in this analysis can be find in [Sequence_capture.pdf](./Sequence_capture.pdf).
 
-1. Identify low copy gene sequences in transcriptome 1
+### 1. Identify low copy gene sequences in transcriptome 1
 2. Find the homologous sequences in transcriptome 2
 3. [Optional] Extract gene structure data from a WGS dataset (number of exons, length of introns, copy number,…)
 
