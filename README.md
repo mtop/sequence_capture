@@ -8,6 +8,9 @@ The first part of your analysis should be to familiarise yourself with the input
 
 In this figure we see the phylogenetic relationship between the two species from where we have transcriptome data (Tr.1 and Tr.2) and one species with an annotated reference genome (or Whole Genome Sequence dataset [WGS]). The number of species from which WGS data is available is rather limited, but a species from the same family or order as your ingroup taxa will most likely be sufficient. 
 
+![Best case scenario](images/2.pdf)
+![Reality](images/3.pdf)
+
 ## Basic work flow
 A more comprehensive description of the steps involved in this analysis can be find in [Sequence_capture.pdf](./Sequence_capture.pdf).
 
