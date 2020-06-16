@@ -34,9 +34,42 @@ where `$INPUT` and `$DB` should be replaced with the input file in fasta format 
 scaffold-CKDK-2001401-Ochna_serrulata	scaffold-CKDK-2001401-Ochna_serrulata	100.000	300	0	0	1	300	1	300	9.42e-157	551
 ```
 
+An example output file can also be found [here](example_data/transcriptome_to_self.BLASTn.txt). `BLAST` matches including the line `# 1 hits found` indicate sequences that (given the settings used for the `BLAST` search) did not have any good matches in the data set, except matches to them self. This is a good indication that these sequences are from single- or low copy genes, and hence what we are looking for. Later on we might want to consider other sequences with poor matches (also indications of low- single copy genes).
+
+You can extract the interesting `BLAST` matches and save them in a new file like this:
+
+```blast
+grep -A1 "# 1 hits found" example_data/transcriptome_to_self.BLASTn.txt > low_copy_sequences.BLASTn.txt
+```
+
+The newly created file `low_copy_sequences.BLASTn.txt` now contains information about the blast matches of the low copy genes. We need to extract the sequence names for the next step, and we can do that like this:
+
+```blast
+cut -f1 low_copy_sequences.BLASTn.txt | grep -v "\-\-" | grep -v "#" > low_copy_names.txt
+```
+This command may look complicated, why I suggest you explore the manual pages for the included sub-commands to learn more (`man cut` and `man grep`).
+
+We now have the names of the (presumed) low copy genes in transcriptome 1 stored in the file `low_copy_names.txt`. We can use this file to extract the DNA sequences using the program `fp.py` available for download [here](https://github.com/topel-research-group/misc).
+
+```blast
+fp.py --grep low_copy_names.txt example_data/Ochna_serrulata_q1000_a500_GO400_e80_final_selection_for_baits.fst > low_copy_sequences.fst
+```
+The extracted sequences are automatically saved to the file `low_copy_sequences.fst`, and the first part of the analysis is finished. It's important to continuously examine the content of the output files in each step, to make sure your commands produce the expected output, and that you find a sufficient amount of low copy sequences.
+
+
+## 2. Find the homologous sequences in transcriptome 2
 
 
 
-2. Find the homologous sequences in transcriptome 2
+
 3. [Optional] Extract gene structure data from a WGS dataset (number of exons, length of introns, copy number,…)
+
+
+
+
+
+
+
+
+
 
