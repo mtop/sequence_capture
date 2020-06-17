@@ -15,10 +15,18 @@ In this figure we see the phylogenetic relationship between the two species from
 A more comprehensive description of the steps involved in this analysis can be find in [Sequence_capture.pdf](./Sequence_capture.pdf). The aim of this type of analysis is to find transcriptome sequences that can be used to design capture probes. To that end, we identify transcriptome sequences (in practise the exon sequences of genes) that is conserved within a phylogenetic clade, and that hopefully contain intron sequences with enough phylogenetically informative sites that we will be able to resolve the relationships in out group of interest (here called the ingroup). Since the transcriptome data often originates from cDNA generated from mRNA, where the intron sequences have been spliced out, we don\'t know how many variable intron regions we can expect from just analysing the transcriptome data. However, the annotated reference genome will provide information on the gene models (UTR's, intron exons etc.) that can be incorporated in out analysis.
 
 ![Venn diagram](images/4.png)
-The area in the venn diagram where all three circles overlap indicates part of the sequence space (i.e. all available sequences) where the transcriptome sequences are conserved (and therefore similar) and the genes then originate from have the desired number of introns. How similar is enough and how many introns that are required is up to you to decide after the first iteration of this analysis. You will most likely want to go back an redo some steps in order to end up with a sufficient number of reference transcript to use as templates for your capture probes.
+The area in the venn diagram where all three circles overlap indicates part of the sequence space (i.e. all available sequences) where the transcriptome sequences are conserved (and therefore similar) and the genes they originate from have the desired number of introns. How similar is enough and how many introns that are required is up to you to decide after the first iteration of this analysis. You will most likely want to go back an redo some steps in order to end up with a sufficient number of reference transcript to use as templates for your capture probes.
 
 ### 1. Identify low copy gene sequences in transcriptome 1
 This part of the analysis is conducted using `BLAST` on the command line. How `BLAST` works is out of the scope of this tutorial, but I suggest you read up on the [on-line manual](https://www.ncbi.nlm.nih.gov/books/NBK279680/) before you start. An example command might looks like this:
+
+First, format the `BLAST` databases needed for this analysis:
+
+```bash
+makeblastdb -in transcriptome1.fst -dbtype nucl
+makeblastdb -in transcriptome2.fst -dbtype nucl
+```
+
 
 ```bash
 blastn -query $INPUT -db $DB -max_target_seqs 2 -outfmt 7 -out $OUT -num_threads $NSLOTS
@@ -39,30 +47,50 @@ An example output file can also be found [here](example_data/transcriptome_to_se
 You can extract the interesting `BLAST` matches and save them in a new file like this:
 
 ```blast
-grep -A1 "# 1 hits found" example_data/transcriptome_to_self.BLASTn.txt > low_copy_sequences.BLASTn.txt
+grep -A1 "# 1 hits found" example_data/transcriptome1_to_self.BLASTn.txt > example_data/low_copy_sequences.BLASTn.txt
 ```
 
 The newly created file `low_copy_sequences.BLASTn.txt` now contains information about the blast matches of the low copy genes. We need to extract the sequence names for the next step, and we can do that like this:
 
 ```blast
-cut -f1 low_copy_sequences.BLASTn.txt | grep -v "\-\-" | grep -v "#" > low_copy_names.txt
+cut -f1 example_data/low_copy_sequences.BLASTn.txt | grep -v "\-\-" | grep -v "#" > example_data/low_copy_names.txt
 ```
 This command may look complicated, why I suggest you explore the manual pages for the included sub-commands to learn more (`man cut` and `man grep`).
 
 We now have the names of the (presumed) low copy genes in transcriptome 1 stored in the file `low_copy_names.txt`. We can use this file to extract the DNA sequences using the program `fp.py` available for download [here](https://github.com/topel-research-group/misc).
 
 ```blast
-fp.py --grep low_copy_names.txt example_data/Ochna_serrulata_q1000_a500_GO400_e80_final_selection_for_baits.fst > low_copy_sequences.fst
+fp.py --grep example_data/low_copy_names.txt example_data/transcriptome1.fst > example_data/low_copy_sequences.fst
 ```
-The extracted sequences are automatically saved to the file `low_copy_sequences.fst`, and the first part of the analysis is finished. It's important to continuously examine the content of the output files in each step, to make sure your commands produce the expected output, and that you find a sufficient amount of low copy sequences.
+The extracted sequences are automatically saved to the file `example_data/low_copy_sequences.fst`, and the first part of the analysis is finished. It's important to continuously examine the content of the output files in each step, to make sure your commands produce the expected output, and that you find a sufficient amount of low copy sequences.
 
+## 2. Make sure the identified sequences in transcriptome 2 are single copy.
+At this stage we could in principle make the assumption that singe copy genes in species 1 (from where we got transcriptome 1) are also single copy genes in species 2. However, to be on the safe side, it's better to explicitly test this assumption also for species 2 like we did above.
 
-## 2. Find the homologous sequences in transcriptome 2
+## 3. Find the homologous sequences in transcriptome 2
+In this part of the analysis you will use your newly identified (presumed) low-copy genes to query the second transcriptome, in order to identify similar (and hopefully homologous) sequences. Here it is worth noting the difference between homology (e.g. shared ancestry) and similarity. The former often leads to the latter but this is not necessary always the case. Still, since we can only infer homology, we will use similarity as a proxy. 
 
+Use the sequences in `low_copy_sequences.fst` to query the sequence database containing the second transcriptome:
 
+```bash
+blastn -query example_data/low_copy_sequences.fst -db example_data/transcriptome2.fst -outfmt '7 std qlen slen' -out example_data/transcriptome1_to_transcriptome2.txt -num_threads 4
+```
+Note that the output format sub-command has a few additional arguments (`std qlen slen`). These can be included in the first `BLAST` command as well but are particularly important for this second `BLAST` analysis, and instructs the program to include the standard output (`std`), the length of the query sequence (`qlen`) and the subject sequence length (`slen`). We can now use this additional output data to identify homologous sequences that full fill the selection criteria we will decide on next.
 
+A first analysis of the blast result can look like this:
 
-3. [Optional] Extract gene structure data from a WGS dataset (number of exons, length of introns, copy number,…)
+```bash
+parseBLASTtable.py -q 100 -i example_data/transcriptome1_to_transcriptome2.txt | wc -l
+	2720
+```
+The command will not display the actual `BLAST` result, only count the number of matches that fulfil the criteria we have set, and in this case we are looking for matches where the query sequence is >=100 bp (indicated by the `-q 100` option). The `parseBLASTtable.py` program has many more options to choose from, in order to select sequences useful for sequence capture probes. It's a good idea to play around with the different options to see which criteria has an effect on the number of identified sequences. A final combination of options may look something like this:
+
+```bash
+parseBLASTtable.py -q 100 -s 100 -% 80 -i example_data/transcriptome1_to_transcriptome2.txt > example_data/conserved_single_copy_genes.txt
+```
+The file `example_data/conserved_single_copy_genes.txt` now contains information on 2117 genes that are presumed single-copy and conserved in both species from where we have transcriptome data. To further filter out dataset we could continue comparing our selection to additional transcriptome datasets by extracting the gene named using `cut` and then the sequences using `fp.py`. The exact steps you take here will depend on the data you have available.
+
+4. [Optional] Extract gene structure data from a WGS dataset (number of exons, length of introns, copy number,…)
 
 
 
