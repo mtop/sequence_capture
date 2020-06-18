@@ -23,9 +23,9 @@ This part of the analysis is conducted using `BLAST` on the command line. How `B
 First, format the `BLAST` databases needed for this analysis:
 
 ```bash
-makeblastdb -in transcriptome1.fst -dbtype nucl
-makeblastdb -in transcriptome2.fst -dbtype nucl
-makeblastdb -in Rcommunis_119_v0.1.transcript.fa -dbtype nucl
+makeblastdb -in example_data/transcriptome1.fst -dbtype nucl
+makeblastdb -in example_data/transcriptome2.fst -dbtype nucl
+makeblastdb -in example_data/Rcommunis_119_v0.1.transcript.fa -dbtype nucl
 ```
 
 
@@ -94,7 +94,7 @@ The file `example_data/conserved_single_copy_genes.txt` now contains information
 Extract the conserved singe-copy genes from transcriptome 1 and use them to design your capture baits, or optionally, do the last step of this tutorial and include information from an annotated reference genome in your analysis.
 
 ```bash
-fp.py --grep conserved_single_copy_genes.txt transcriptome1.fst > conserved_single_copy_genes_transcript1.fst
+fp.py --grep example_data/conserved_single_copy_genes.txt transcriptome1.fst > example_data/conserved_single_copy_genes_transcript1.fst
 ```
 
 4. [Optional] Extract gene structure data from a WGS dataset (number of exons, length of introns, copy number,…)
@@ -105,33 +105,27 @@ In this example we can use the reference genome of _Ricinus communis_ available 
 In the example below we are identifying the genes in the _Ricinus communis_ reference genome that consists of at least three exons (`--cds 3`) where each exon is at least 50 bp long (`--min_cds_length 50`).
 
 ```bash
-parseGff3.py --gff3 Rcommunis_119_v0.1.gene.gff3 --cds 3 --min_cds_length 50 > Rcommunis_cds3_50bp_names.txt
+parseGff3.py --gff3 example_data/Rcommunis_119_v0.1.gene.gff3 --cds 3 --min_cds_length 50 > example_data/Rcommunis_cds3_50bp_names.txt
 ```
 Then we use these names to extract the sequences.
 
 ```bash
-fp.py --grep Rcommunis_cds3_50bp_names.txt Rcommunis_119_v0.1.transcript.fa > Rcommunis_cds3_50bp_transcript.fst
+fp.py --grep example_data/Rcommunis_cds3_50bp_names.txt example_data/Rcommunis_119_v0.1.transcript.fa > example_data/Rcommunis_cds3_50bp_transcript.fst
 ```
 Final steps in this analysis includes identifying which sequences in `conserved_single_copy_genes_transcript1.fst` have a good `BLAST` match to the identified _Ricinus communis_ sequences, and then extract only these sequences to a file.
 
 ```bash
-blastn -query conserved_single_copy_genes_transcript1.fst -db Rcommunis_119_v0.1.transcript.fa -outfmt '7 std qlen slen' -out transcript1_to_Rcommunis.txt -num_threads 4
+blastn -query example_data/conserved_single_copy_genes_transcript1.fst -db example_data/Rcommunis_119_v0.1.transcript.fa -outfmt '7 std qlen slen' -out example_data/transcript1_to_Rcommunis.txt -num_threads 4
 ```
 
 ```bash
-parseBLASTtable.py -q 100 -s 100 -% 80 -i transcript1_to_Rcommunis.txt > bait_sequences_names.txt
+parseBLASTtable.py -q 100 -s 100 -% 80 -i example_data/transcript1_to_Rcommunis.txt > example_data/bait_sequences_names.txt
 ```
 
 ```bash
-fp.py --grep bait_sequences_names.txt conserved_single_copy_genes_transcript1.fst > bait_sequences.fasta
+fp.py --grep example_data/bait_sequences_names.txt example_data/conserved_single_copy_genes_transcript1.fst > example_data/bait_sequences.fasta
 ```
 
 In this example, the file `bait_sequences.fasta` contains 946 sequences from transcriptome 1 that we assume are 1). singe-copy, 2). conserved across the clade we are analysing, and contain at least two introns (sitting between the three or more exons we identified in _Ricinus communis_) and exon sequences that are around 50 bp or longer.
 
 Depending on the data you are analysing, you might want to go back and redo some of the steps above, if for example you end up with to few, or to many sequences to base your baits on.
-
-
-
-
-
-
