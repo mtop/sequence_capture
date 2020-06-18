@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 import argparse
@@ -113,13 +113,13 @@ def parse_gff3():
 	for gene in gene_dict:
 		if int(gene_dict[gene].get_CDS_count()) >= int(args.cds) and gene_dict[gene].get_min_CDS_length() >= int(args.min_cds_length):
 			if args.verbose == False:
-				print gene_dict[gene].get_name()
-				print gene_dict[gene].get_CDS_count()			# Devel.
+				print(gene_dict[gene].get_name())
+			#	print(gene_dict[gene].get_CDS_count())			# Devel.
 			else:
 				while first:
-					print "# Pacid	Name	Nr._CDS	Total_CDS_length	Min._CDS_length"
+					print("# Pacid	Name	Nr._CDS	Total_CDS_length	Min._CDS_length")
 					first = False
-				print gene_dict[gene].get_pacid(), gene_dict[gene].get_name(), gene_dict[gene].get_CDS_count(), gene_dict[gene].get_CDS_length(), gene_dict[gene].get_min_CDS_length()
+				print(gene_dict[gene].get_pacid(), gene_dict[gene].get_name(), gene_dict[gene].get_CDS_count(), gene_dict[gene].get_CDS_length(), gene_dict[gene].get_min_CDS_length())
 
 
 if __name__ == "__main__":
