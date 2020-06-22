@@ -18,7 +18,7 @@ A more comprehensive description of the steps involved in this analysis can be f
 
 The area in the Venn diagram where all three circles overlap indicates part of the sequence space (i.e. all available sequences) where the transcriptome sequences are conserved (and therefore similar) and the genes they originate from have the desired number of introns. The required level of similarity and number of introns are for you to decide after the first iteration of this analysis. You will most likely want to go back and redo some steps in order to end up with a sufficient number of reference transcripts to use as templates for your capture probes.
 
-## 1. Identify low copy gene sequences in transcriptome 1
+### 1. Identify low copy gene sequences in transcriptome 1
 This part of the analysis is conducted using `BLAST` on the command line. How `BLAST` works is out of the scope of this tutorial, but I suggest you read up on the [on-line manual](https://www.ncbi.nlm.nih.gov/books/NBK279680/) before you start. An example command might looks like this:
 
 First, format the `BLAST` databases needed for this analysis:
