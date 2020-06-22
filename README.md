@@ -95,7 +95,7 @@ The file `example_data/conserved_single_copy_genes.txt` now contains information
 Extract the conserved singe-copy genes from transcriptome 1 and use them to design your capture baits, or optionally, do the last step of this tutorial and include information from an annotated reference genome in your analysis.
 
 ```bash
-fp.py --grep example_data/conserved_single_copy_genes.txt transcriptome1.fst > example_data/conserved_single_copy_genes_transcript1.fst
+fp.py --grep example_data/conserved_single_copy_genes.txt example_data/transcriptome1.fst > example_data/conserved_single_copy_genes_transcript1.fst
 ```
 
 ## 4. [Optional] Extract gene structure data from a WGS dataset (number of exons, length of introns, copy number, ...)
